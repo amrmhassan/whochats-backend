@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "nexe",
     "debug": "ndb server.js",
-    "start": "nodemon main.js"
+    "start": "nodemon main.js",
+    "heroku-postbuild": "npm install"
   },
   "keywords": [],
   "author": "",
