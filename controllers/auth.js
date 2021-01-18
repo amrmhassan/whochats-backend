@@ -5,7 +5,7 @@ import AppError from '../utils/AppError.js';
 import genRandomToken from '../utils/generateRandomToken.js';
 import { sendEmail } from './emailController.js';
 import bcrypt from 'bcrypt';
-import crypto from 'crypto';
+import io from '../startup/io.js';
 
 const appError = new AppError();
 
@@ -50,7 +50,6 @@ export const login = catchAsync(async (req, res, next) => {
     req.socket.remoteAddress ||
     (req.connection.socket ? req.connection.socket.remoteAddress : null);
 
-  console.log(ip);
   const { email, password } = req.body;
   if (!email || !password) {
     return next(appError.addError('please provide email and password', 400));
@@ -67,6 +66,8 @@ export const login = catchAsync(async (req, res, next) => {
   if (!correctPassword) {
     return next(appError.addError('incorrect email or password', 400));
   }
+  // 4-a] saving the user onlineId
+
   // 5] give the user the token
   createAndSendToken(user, res);
 });
@@ -246,9 +247,12 @@ export const protectNormalUser = catchAsync(async (req, res, next) => {
   if (passwordChanged) {
     return next(appError.addError('password changed, login again!', 400));
   }
+  // 3-a]//? emit an event to all users if the onlineId was null that this user is online now
+
+  // 3-b] update the user onlineId prop
+  // 4] login success ==> let the user in by setting req.user to user got from id in token
   req.user = user;
   next();
-  // 4] login success ==> let the user in by setting req.user to user got from id in token
 });
 
 //? update logged in user password

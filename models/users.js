@@ -57,15 +57,16 @@ const userSchema = new mongoose.Schema(
     phone: String,
     randomToken: String,
     randomTokenExpiresAt: Date,
+    onlineId: String,
+    lastSeenAt: Date,
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
 // Hashing passwords when first created or modified
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 
-  // console.log('Password has been changed');
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordChangedAt = Date.now() - 1000;
   this.passwordConfirm = undefined;
@@ -94,6 +95,10 @@ userSchema.methods.passwordChangedAfter = function (
   //100 older
   // password changed so return true
 };
+
+userSchema.virtual('fullName').get(function () {
+  return `${this.firstName} ${this.lastName}`;
+});
 
 const User = mongoose.model('User', userSchema);
 export default User;

@@ -7,6 +7,9 @@ export const joinMyRooms = (socket, data) => {
     socket.to(room).broadcast.emit('server--user-joined-room', user);
   });
 };
+export const userAddedNewRoom = (socket, data) => {
+  socket.broadcast.emit('server--user-added-new-room', data);
+};
 
 //? this code is for getting all rooms with users in it
 // io.on('connection', (socket) => {
