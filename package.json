@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "nexe",
-    "debug": "ndb server.js",
+    "debug": "ndb main.js",
     "start": "nodemon main.js",
     "heroku-postbuild": "npm install"
   },

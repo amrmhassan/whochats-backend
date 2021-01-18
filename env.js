@@ -9,6 +9,6 @@ export const env = () => {
       process.env[key] = variables[key];
     });
   } catch (error) {
-    console.error({ error });
+    console.error('err', error.message);
   }
 };
