@@ -10,36 +10,45 @@ const io = new Server(server, {
 });
 
 io.use(async (socket, next) => {
-  const handshakeData = socket.request;
-  const userId = handshakeData._query.id;
-  const socketId = socket.id;
+  try {
+    const handshakeData = socket.request;
+    const userId = handshakeData._query.id;
+    const socketId = socket.id;
 
-  const onlineUser = await User.findById(userId);
-  //! emit to all users that one user is online now
-  //? on client side => loop on the rooms with room.userToShowOnRoom._id === userId
-  //? and if it the currently opened room => update it also
-  io.emit('server--user-online', {
-    userId: onlineUser._id,
-    onlineId: socket.id,
-  });
-  onlineUser.onlineId = socketId;
-  onlineUser.lastSeenAt = undefined;
-  await onlineUser.save({ validateBeforeSave: false });
+    const onlineUser = await User.findById(userId);
+    //! emit to all users that one user is online now
+    //? on client side => loop on the rooms with room.userToShowOnRoom._id === userId
+    //? and if it the currently opened room => update it also
+    io.emit('server--user-online', {
+      userId: onlineUser._id,
+      onlineId: socket.id,
+    });
+    onlineUser.onlineId = socketId;
+    onlineUser.lastSeenAt = undefined;
+    await onlineUser.save({ validateBeforeSave: false });
+  } catch (err) {
+    console.log(err.message);
+  }
+
   next();
 });
 
 io.on('connection', async (socket) => {
   socket.on('disconnect', async () => {
-    const user = await User.findOne({ onlineId: socket.id });
-    user.onlineId = undefined;
-    user.lastSeenAt = new Date();
-    if (user) {
-      await user.save({ validateBeforeSave: false });
-      //! emit to all users that one user is off line now
-      io.emit('server--user-offline', {
-        userId: user._id,
-        lastSeenAt: user.lastSeenAt,
-      });
+    try {
+      const user = await User.findOne({ onlineId: socket.id });
+      user.onlineId = undefined;
+      user.lastSeenAt = new Date();
+      if (user) {
+        await user.save({ validateBeforeSave: false });
+        //! emit to all users that one user is off line now
+        io.emit('server--user-offline', {
+          userId: user._id,
+          lastSeenAt: user.lastSeenAt,
+        });
+      }
+    } catch (err) {
+      console.log(err.message);
     }
   });
 });
