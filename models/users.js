@@ -10,12 +10,7 @@ const userSchema = new mongoose.Schema(
       maxlength: 50,
       minlength: 3,
     },
-    lastName: {
-      type: String,
-      required: true,
-      maxlength: 50,
-      minlength: 3,
-    },
+
     email: {
       type: String,
       lowercase: true,
@@ -63,7 +58,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-// Hashing passwords when first created or modified
+//? Hashing passwords when first created or modified
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 
@@ -74,7 +69,7 @@ userSchema.pre('save', async function (next) {
   this.randomTokenExpiresAt = undefined;
   next();
 });
-// adding correct password method
+//? adding correct password method
 userSchema.methods.correctPassword = async function (
   providedPassword,
   realPassword
@@ -83,7 +78,7 @@ userSchema.methods.correctPassword = async function (
   return correctPassword;
 };
 
-// checking if password has been changed after generating jwt
+//? checking if password has been changed after generating jwt
 userSchema.methods.passwordChangedAfter = function (
   passwordChangingTime,
   jwtCreatingTime
@@ -97,7 +92,13 @@ userSchema.methods.passwordChangedAfter = function (
 };
 
 userSchema.virtual('fullName').get(function () {
-  return `${this.firstName} ${this.lastName}`;
+  return `${this.firstName}`;
+});
+
+//? add this for filtering user data that will be sent to every users
+userSchema.pre(/^find/, function (next) {
+  // this.select('-password')
+  next();
 });
 
 const User = mongoose.model('User', userSchema);

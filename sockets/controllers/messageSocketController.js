@@ -8,7 +8,6 @@ export const userStartTyping = (socket, data) => {
       userId: data.typingUserId,
       typingUserOnlineId: data.typingUserOnlineId,
     });
-    console.log('start typing', data);
   }
 };
 export const userStoppedTyping = (socket, data) => {

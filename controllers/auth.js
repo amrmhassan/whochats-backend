@@ -29,6 +29,7 @@ export const signUp = catchAsync(async (req, res, next) => {
     phone,
     photo,
   } = req.body;
+
   const user = await User.create({
     firstName,
     lastName,

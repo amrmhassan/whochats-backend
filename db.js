@@ -16,7 +16,10 @@ export default {
         useFindAndModify: false,
         useCreateIndex: true,
       })
-      .then(() => console.log('connected to db'))
+      .then(() => {
+        console.log('connected to db');
+        console.log(`${process.env.NODE_ENV} mode`);
+      })
       .catch((err) => console.log(err.message));
   },
 };
