@@ -6,7 +6,7 @@ import roomsRoute from '../routes/roomsRoutes.js';
 import messagesRoutes from '../routes/messagesRoutes.js';
 import emailRoutes from '../routes/emailRoutes.js';
 import blockRoutes from '../routes/blockRoutes.js';
-import uploadsRoute from '../routes/uploadsRoute.js';
+// import uploadsRoute from '../routes/uploadsRoute.js';
 import express from 'express';
 import globalErrorHandling from '../utils/globalErrorHandling.js';
 import AppError from '../utils/AppError.js';
@@ -30,7 +30,7 @@ export default {
     app.use('/api/v1/messages', messagesRoutes);
     app.use('/api/v1/emails', emailRoutes);
     app.use('/api/v1/blocks', blockRoutes);
-    app.use('/api/v1/upload', uploadsRoute);
+    // app.use('/api/v1/upload', uploadsRoute);
 
     app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
