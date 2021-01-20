@@ -11,7 +11,6 @@ import express from 'express';
 import globalErrorHandling from '../utils/globalErrorHandling.js';
 import AppError from '../utils/AppError.js';
 import path from 'path';
-// import bodyParser from 'body-parser';
 
 export default {
   addMiddleWares: () => {
@@ -32,7 +31,7 @@ export default {
     app.use('/api/v1/blocks', blockRoutes);
     app.use('/api/v1/upload', uploadsRoute);
 
-    app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+    app.use('/uploads', express.static(path.join(__dirname, './uploads/')));
 
     if (process.env.NODE_ENV === 'production') {
       app.use(express.static(path.join(__dirname, '/build')));
