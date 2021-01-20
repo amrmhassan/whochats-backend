@@ -1,10 +1,8 @@
 import { Router } from 'express';
-import multer from 'multer';
 import * as userController from '../controllers/userController.js';
 import * as auth from '../controllers/auth.js';
 
 const router = Router();
-const upload = multer({ dest: '../../uploads/users' });
 
 //? routes for anyone
 router.route('/signup').post(auth.signUp);
