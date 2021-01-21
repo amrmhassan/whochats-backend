@@ -33,6 +33,10 @@ const messageSchema = new mongoose.Schema(
       default: false,
       required: true,
     },
+    clientId: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

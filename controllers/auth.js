@@ -5,7 +5,6 @@ import AppError from '../utils/AppError.js';
 import genRandomToken from '../utils/generateRandomToken.js';
 import { sendEmail } from './emailController.js';
 import bcrypt from 'bcrypt';
-import io from '../startup/io.js';
 
 const appError = new AppError();
 
@@ -67,7 +66,9 @@ export const login = catchAsync(async (req, res, next) => {
   if (!correctPassword) {
     return next(appError.addError('incorrect email or password', 400));
   }
-  // 4-a] saving the user onlineId
+  // 4-a] saving the user onlineId //? not here but in io.js when the user connect to our server
+  // 4-b] update all message that this user is receiver in it //? not here but in io.js when the user connect to our server
+  // Message.updateMany({"receiver": user._id, status:'sent'}, {"$set":{"sent": 'delivered}});
 
   // 5] give the user the token
   createAndSendToken(user, res);

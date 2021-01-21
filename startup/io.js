@@ -1,6 +1,7 @@
 import { Server } from 'socket.io';
 import server from './server.js';
 import User from '../models/users.js';
+import Message from '../models/messages.js';
 
 const io = new Server(server, {
   cors: {
@@ -19,13 +20,33 @@ io.use(async (socket, next) => {
     //! emit to all users that one user is online now
     //? on client side => loop on the rooms with room.userToShowOnRoom._id === userId
     //? and if it the currently opened room => update it also
+    // 1] saving the user onlineId
+    onlineUser.onlineId = socketId;
+    onlineUser.lastSeenAt = undefined;
+    await onlineUser.save({ validateBeforeSave: false });
+    //? emitting to all users that this user is now online
     io.emit('server--user-online', {
       userId: onlineUser._id,
       onlineId: socket.id,
     });
-    onlineUser.onlineId = socketId;
-    onlineUser.lastSeenAt = undefined;
-    await onlineUser.save({ validateBeforeSave: false });
+    // 4-b] update all message that this user is receiver in it
+    // Message.updateMany({"receiver": user._id, status:'sent'}, {"$set":{"sent": 'delivered}});
+    const messages = await Message.find({
+      receiver: onlineUser._id,
+      status: 'sent',
+    });
+    //? looping through messages and set their status to delivered
+    //! when the user send a message and the receiver has onlineId prop => emit to the sender that this message is delivered
+    messages.forEach(async (message) => {
+      message.status = 'delivered';
+      message.save({ validateBeforeSave: false });
+      //? emitting to all users that are sender of these messages that messages have been delivered to this user
+      const senderUser = await User.findById(message.sender);
+      const senderOnlineId = senderUser.onlineId;
+      if (senderOnlineId) {
+        io.to(senderOnlineId).emit('server--user-send-message', message);
+      }
+    });
   } catch (err) {
     console.log(err.message);
   }

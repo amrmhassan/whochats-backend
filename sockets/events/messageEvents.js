@@ -10,6 +10,10 @@ const events = (socket) => {
   socket.on('user-stopped-typing', (data) =>
     messageSController.userStoppedTyping(socket, data)
   );
+
+  socket.on('user-read-message', (data) =>
+    messageSController.userReadMessage(socket, data)
+  );
 };
 
 export default events;
