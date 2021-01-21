@@ -63,6 +63,8 @@ export const createMessage = catchAsync(async (req, res, next) => {
 export const getRoomMessages = catchAsync(async (req, res, next) => {
   // 1] get room from req.body
   const { id } = req.params;
+  // 2] get user from req.user
+  const user = req.user;
   // 2] get the last 200 room messages
   //! update this to get the other messages when user ask for them
   //! it will be like paging
@@ -71,7 +73,10 @@ export const getRoomMessages = catchAsync(async (req, res, next) => {
 
   //! updating messages to be seen and emitting to users that messages are seen now
   messages.forEach(async (message) => {
-    if (message.status !== 'seen') {
+    if (
+      message.status !== 'seen' &&
+      String(message.receiver) === String(user._id)
+    ) {
       message.status = 'seen';
       message.save({ validateBeforeSave: false });
       //? emitting to all users that are sender of these messages that messages have been delivered to this user
