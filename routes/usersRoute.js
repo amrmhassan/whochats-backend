@@ -15,6 +15,7 @@ router.post('/resetPassword/:token', auth.resetPassword);
 router.use(auth.protectNormalUser);
 router.post('/updatePassword', auth.updatePassword);
 router.get('/me', auth.getMe);
+router.patch('/updateMe', auth.updateMe);
 router.get('/getUserData/:id', userController.userGetAnotherUserData);
 
 //? routes for admins only
@@ -23,6 +24,5 @@ router
   .route('/')
   .get(userController.getAllUsers)
   .post(userController.addNewUser);
-router.route('/:id').patch(userController.updateUser);
 
 export default router;

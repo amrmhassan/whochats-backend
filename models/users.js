@@ -10,7 +10,10 @@ const userSchema = new mongoose.Schema(
       maxlength: 50,
       minlength: 3,
     },
-
+    about: {
+      type: String,
+      default: 'Hey!',
+    },
     email: {
       type: String,
       lowercase: true,

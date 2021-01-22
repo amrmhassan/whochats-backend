@@ -309,3 +309,44 @@ export const getMe = catchAsync(async (req, res, next) => {
     user,
   });
 });
+
+export const updateMe = catchAsync(async (req, res, next) => {
+  // 1] getting current user from res.user
+  const user = req.user;
+  // 2] getting new userInfo from req.body
+  const newData = {};
+  const allowedFields = ['firstName', 'photo', 'about'];
+  // 2-a] check if all allowed fields are empty
+  //?
+  let userChangedData = false;
+  if (req.body.photo !== user.photo) {
+    userChangedData = true;
+  }
+
+  allowedFields.forEach((field) => {
+    if (req.body[field] !== user[field]) {
+      userChangedData = true;
+    }
+  });
+  if (!userChangedData) {
+    return next(appError.addError('no info changed', 400));
+  }
+  //?
+  Object.keys(req.body).forEach((key) => {
+    if (allowedFields.includes(key)) {
+      newData[key] = req.body[key];
+    }
+  });
+
+  // 3] save them to database
+  const doc = await User.findByIdAndUpdate(user._id, newData, {
+    new: true,
+    runValidators: true,
+  });
+
+  // 4] send back user new data
+  res.status(200).json({
+    status: 'success',
+    data: doc,
+  });
+});

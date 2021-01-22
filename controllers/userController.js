@@ -13,7 +13,7 @@ export const addNewUser = factory.createOne(User, [
   'phone',
 ]);
 
-export const updateUser = factory.updateOne(User);
+// export const updateUser = factory.updateOne(User);
 
 export const userGetAnotherUserData = catchAsync(async (req, res, next) => {
   // 1] get user id from req.params

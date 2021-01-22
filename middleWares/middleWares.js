@@ -11,6 +11,8 @@ import express from 'express';
 import globalErrorHandling from '../utils/globalErrorHandling.js';
 import AppError from '../utils/AppError.js';
 import path from 'path';
+// import * as auth from '../controllers/auth.js';
+// import bodyParser from 'body-parser';
 
 export default {
   addMiddleWares: () => {
@@ -18,6 +20,9 @@ export default {
     const __dirname = path.resolve();
 
     app.use(express.json());
+
+    // app.use(bodyParser.json({ limit: '1mb' }));
+    // app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
     app.use(cors());
     app.use((req, res, next) => {
       req.requestedAt = new Date().toISOString();
@@ -31,7 +36,11 @@ export default {
     app.use('/api/v1/blocks', blockRoutes);
     app.use('/api/v1/upload', uploadsRoute);
 
-    app.use('/uploads', express.static(path.join(__dirname, './uploads/')));
+    app.use(
+      '/uploads',
+      // auth.protectNormalUser,
+      express.static(path.join(__dirname, './uploads/'))
+    );
 
     if (process.env.NODE_ENV === 'production') {
       app.use(express.static(path.join(__dirname, '/build')));
