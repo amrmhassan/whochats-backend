@@ -29,6 +29,5 @@ export const userReadMessage = async (socket, data) => {
 
   if (senderOnlineId) {
     socket.to(senderOnlineId).emit('server--user-send-message', newMessage);
-    console.log(newMessage);
   }
 };
