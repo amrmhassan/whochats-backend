@@ -12,8 +12,6 @@ import express from 'express';
 import globalErrorHandling from '../utils/globalErrorHandling.js';
 import AppError from '../utils/AppError.js';
 import path from 'path';
-// import * as auth from '../controllers/auth.js';
-// import bodyParser from 'body-parser';
 
 export default {
   addMiddleWares: () => {
@@ -37,12 +35,6 @@ export default {
     app.use('/api/v1/blocks', blockRoutes);
     app.use('/api/v1/upload', uploadsRoute);
     app.use('/sms', smsRoutes);
-    // app.get('/email', (req, res) => {
-    //   res.render('email/verifyEmail', {
-    //     firstName: 'Ossama',
-    //     url: 'https://facebook.com',
-    //   });
-    // });
 
     app.use(
       '/uploads',

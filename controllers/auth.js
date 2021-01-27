@@ -8,6 +8,7 @@ import bcrypt from 'bcrypt';
 import Email from '../utils/email.js';
 
 const appError = new AppError();
+const frontend_link = 'https://whochats.netlify.app';
 
 const createAndSendToken = (user, res, statusCode = 200) => {
   const token = jwt.sign({ id: user._id }, process.env.jwtPrivateKey);
@@ -43,9 +44,7 @@ export const signUp = catchAsync(async (req, res, next) => {
   const encryptedToken = await bcrypt.hash(randomTokenVerifying, 8);
 
   // 2] generate url for verification
-  const url = `${req.protocol}://${req.get(
-    'host'
-  )}/verifyEmail/${randomTokenVerifying}`;
+  const url = `${req.protocol}://${frontend_link}/verifyEmail/${randomTokenVerifying}`;
 
   await new Email({ firstName, email }, url).verifyEmail();
   const user = await User.create({
@@ -188,7 +187,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   // 5] send it to the user email
   await new Email(
     { firstName: user.firstName, email: user.email },
-    `${req.protocol}://${req.get('host')}/resetPassword/${randomToken}`
+    `${req.protocol}://${frontend_link}/resetPassword/${randomToken}`
   ).sendPasswordReset();
 
   // 6] res to the user
