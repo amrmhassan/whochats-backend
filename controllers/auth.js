@@ -44,7 +44,7 @@ export const signUp = catchAsync(async (req, res, next) => {
   const encryptedToken = await bcrypt.hash(randomTokenVerifying, 8);
 
   // 2] generate url for verification
-  const url = `${req.protocol}://${frontend_link}/verifyEmail/${randomTokenVerifying}`;
+  const url = `${frontend_link}/verifyEmail/${randomTokenVerifying}`;
 
   await new Email({ firstName, email }, url).verifyEmail();
   const user = await User.create({
@@ -187,7 +187,7 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   // 5] send it to the user email
   await new Email(
     { firstName: user.firstName, email: user.email },
-    `${req.protocol}://${frontend_link}/resetPassword/${randomToken}`
+    `${frontend_link}/resetPassword/${randomToken}`
   ).sendPasswordReset();
 
   // 6] res to the user
