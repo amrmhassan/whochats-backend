@@ -4,6 +4,7 @@ import Message from '../models/messages.js';
 import io from '../startup/io.js';
 import User from '../models/users.js';
 import Block from '../models/blocks.js';
+import dayInjector from '../utils/dayRecognizer.js';
 
 const appError = new AppError();
 
@@ -87,10 +88,33 @@ export const getRoomMessages = catchAsync(async (req, res, next) => {
       }
     }
   });
+
+  //! for adding messages days admin messages
+  const messagesClone = [];
+  let currentDay = '';
+  messages.forEach((message) => {
+    const currentMessageDay = dayInjector(message.createdAt);
+    if (currentMessageDay !== currentDay) {
+      currentDay = currentMessageDay;
+      const dayMsg = {
+        sender: 'admin',
+        messageTXT: currentMessageDay,
+        createdAt: message.createdAt,
+      };
+      messagesClone.push(dayMsg);
+    }
+    messagesClone.push(message);
+
+    // looping through all messages and set currentDay to the current message createdAt prop day
+    // if the currentDay is different from the current message createdAt prop day
+    // then add a new admin message with the current day
+  });
+  //! end for adding messages days admin messages
+
   //? results will always be 200 if messages are more than 200
   res.status(200).json({
     status: 'success',
     results: messages.length,
-    data: messages,
+    data: messagesClone,
   });
 });

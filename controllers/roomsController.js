@@ -27,7 +27,7 @@ export const getMyRooms = catchAsync(async (req, res, next) => {
         ? String(room.otherUser)
         : String(room.creator);
     const userToShowOnRoom = await User.findById(userIdToShowInRoom).select(
-      'firstName  photo email onlineId lastSeenAt'
+      'firstName  photo email onlineId lastSeenAt about'
     );
     const myBlock = await Block.findOne({ room: room._id, creator: user._id });
     const otherUserBlock = await Block.findOne({
@@ -154,7 +154,7 @@ export const acceptRoom = catchAsync(async (req, res, next) => {
   }
   // 3-b] get creator user cause we will need him down
   const creatorUser = await User.findById(updatedRoom.creator).select(
-    'firstName  photo email onlineId lastSeenAt'
+    'firstName  photo email onlineId lastSeenAt about'
   );
 
   //! adding userToShowOnRoom
@@ -172,7 +172,7 @@ export const acceptRoom = catchAsync(async (req, res, next) => {
   const roomForCreator = { ...updatedRoom }._doc;
   roomForCreator.userToShowOnRoom = await User.findById(
     updatedRoom.otherUser
-  ).select('firstName  photo email onlineId lastSeenAt');
+  ).select('firstName  photo email onlineId lastSeenAt about');
   if (creatorOnlineId) {
     io.to(creatorOnlineId).emit('server--user-accept-new-room', updatedRoom);
   }
@@ -252,7 +252,7 @@ export const getOneRoom = catchAsync(async (req, res, next) => {
       ? String(room.otherUser)
       : String(room.creator);
   const userToShowOnRoom = await User.findById(userIdToShowInRoom).select(
-    'firstName  photo email onlineId lastSeenAt'
+    'firstName  photo email onlineId lastSeenAt about'
   );
   roomClone.userToShowOnRoom = userToShowOnRoom;
   roomClone.myBlock = myBlock;

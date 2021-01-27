@@ -6,6 +6,7 @@ import roomsRoute from '../routes/roomsRoutes.js';
 import messagesRoutes from '../routes/messagesRoutes.js';
 import emailRoutes from '../routes/emailRoutes.js';
 import blockRoutes from '../routes/blockRoutes.js';
+import smsRoutes from '../routes/smsRoutes.js';
 import uploadsRoute from '../routes/uploadsRoute.js';
 import express from 'express';
 import globalErrorHandling from '../utils/globalErrorHandling.js';
@@ -35,6 +36,13 @@ export default {
     app.use('/api/v1/emails', emailRoutes);
     app.use('/api/v1/blocks', blockRoutes);
     app.use('/api/v1/upload', uploadsRoute);
+    app.use('/sms', smsRoutes);
+    // app.get('/email', (req, res) => {
+    //   res.render('email/verifyEmail', {
+    //     firstName: 'Ossama',
+    //     url: 'https://facebook.com',
+    //   });
+    // });
 
     app.use(
       '/uploads',

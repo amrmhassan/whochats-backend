@@ -10,6 +10,7 @@ router.route('/login').post(auth.login);
 router.route('/loginWithToken').post(auth.loginWithToken);
 router.post('/forgotPassword', auth.forgotPassword);
 router.post('/resetPassword/:token', auth.resetPassword);
+router.post('/verifyEmail/:token', auth.verifyEmail);
 
 //? routes for logged in users only
 router.use(auth.protectNormalUser);

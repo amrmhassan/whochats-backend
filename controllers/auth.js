@@ -5,6 +5,7 @@ import AppError from '../utils/AppError.js';
 import genRandomToken from '../utils/generateRandomToken.js';
 import { sendEmail } from './emailController.js';
 import bcrypt from 'bcrypt';
+import Email from '../utils/email.js';
 
 const appError = new AppError();
 
@@ -29,6 +30,24 @@ export const signUp = catchAsync(async (req, res, next) => {
     photo,
   } = req.body;
 
+  // 2-a] check if user already existed
+
+  const existedUser = await User.findOne({ email });
+  if (existedUser) {
+    return next(appError.addError('User already exists', 400));
+  }
+
+  // 3] send verification email
+  // 4] generate random token 32 letters and numbers
+  const randomTokenVerifying = genRandomToken(32);
+  const encryptedToken = await bcrypt.hash(randomTokenVerifying, 8);
+
+  // 2] generate url for verification
+  const url = `${req.protocol}://${req.get(
+    'host'
+  )}/verifyEmail/${randomTokenVerifying}`;
+
+  await new Email({ firstName, email }, url).verifyEmail();
   const user = await User.create({
     firstName,
     lastName,
@@ -38,7 +57,18 @@ export const signUp = catchAsync(async (req, res, next) => {
     phone,
     photo,
   });
-  createAndSendToken(user, res, 201);
+
+  // 4-a] save random token to database after hashing it && change expiry date
+
+  //====================
+
+  user.randomTokenVerifying = encryptedToken;
+  await user.save({ validateBeforeSave: false });
+  res.status(200).json({
+    status: 'success',
+    data: user,
+  });
+  // createAndSendToken(user, res, 201);
 });
 //? logging users in
 export const login = catchAsync(async (req, res, next) => {
@@ -69,6 +99,10 @@ export const login = catchAsync(async (req, res, next) => {
   // 4-a] saving the user onlineId //? not here but in io.js when the user connect to our server
   // 4-b] update all message that this user is receiver in it //? not here but in io.js when the user connect to our server
   // Message.updateMany({"receiver": user._id, status:'sent'}, {"$set":{"sent": 'delivered}});
+  // 4-c] check if the email is verified
+  if (!user.verified) {
+    return next(appError.addError('please verify your email first', 401));
+  }
 
   // 5] give the user the token
   createAndSendToken(user, res);
@@ -152,17 +186,11 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
   //====================
 
   // 5] send it to the user email
-  // receiver: options.receiver,
-  // subject: options.subject,
-  // message: options.message,
-  const options = {
-    receiver: email,
-    subject: 'Resetting password',
-    message: `Use this link to reset your password ${req.protocol}://${req.get(
-      'host'
-    )}/resetPassword/${randomToken} ,Link is only valid for 10 minutes`,
-  };
-  sendEmail(options);
+  await new Email(
+    { firstName: user.firstName, email: user.email },
+    `${req.protocol}://${req.get('host')}/resetPassword/${randomToken}`
+  ).sendPasswordReset();
+
   // 6] res to the user
   res.status(200).json({
     status: 'success',
@@ -253,6 +281,14 @@ export const protectNormalUser = catchAsync(async (req, res, next) => {
 
   // 3-b] update the user onlineId prop
   // 4] login success ==> let the user in by setting req.user to user got from id in token
+
+  // 5] check if the user email is verified
+
+  if (!user.verified) {
+    return next(
+      appError.addError('please check your email for verification link', 401)
+    );
+  }
   req.user = user;
   next();
 });
@@ -349,4 +385,37 @@ export const updateMe = catchAsync(async (req, res, next) => {
     status: 'success',
     data: doc,
   });
+});
+
+//? verifying email
+export const verifyEmail = catchAsync(async (req, res, next) => {
+  // 1] getting user email from req.body.email and token from req.params.token
+  const token = req.params.token;
+  const email = req.body.email;
+  if (!email) {
+    return next(
+      appError.addError('please verify with the same device you signed up', 401)
+    );
+  }
+  console.log({ token, email });
+  // 2] getting user from database by email
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(appError.addError('no users found', 400));
+  }
+  // 3] check for randomTokenVerifying
+  const randomTokenVerifying = user.randomTokenVerifying;
+  if (!randomTokenVerifying) {
+    return next(appError.addError(`sorry we can't verify your email`, 400));
+  }
+  const correctToken = await bcrypt.compare(token, randomTokenVerifying);
+  if (!correctToken) {
+    return next(appError.addError('invalid token', 400));
+  }
+  // 4] if randomTokenVerifying exists and checked to be true then update the verified prop to true
+  user.verified = true;
+  user.randomTokenVerifying = undefined;
+  await user.save({ validateBeforeSave: false });
+  // 5] send the token back to the user
+  createAndSendToken(user, res, 200);
 });
