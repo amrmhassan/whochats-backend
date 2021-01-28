@@ -33,3 +33,37 @@ export const userGetAnotherUserData = catchAsync(async (req, res, next) => {
     data: user,
   });
 });
+
+//? search users
+export const searchUsers = catchAsync(async (req, res, next) => {
+  // 1] get searchQuery from req.params.q and get the current user
+  const searchQuery = req.params.q;
+  const user = req.user;
+  // 2] recognize if it is a name or email by containing @ sign
+  const isEmail = searchQuery.indexOf('@') !== -1;
+
+  // 3] then search this query from database
+  let users;
+  if (isEmail) {
+    users = await User.find({
+      email: {
+        $regex: new RegExp(`.*${searchQuery}.*`, 'gi'),
+        $ne: user.email,
+      },
+    });
+  } else {
+    users = await User.find({
+      firstName: {
+        $regex: new RegExp(`.*${searchQuery}.*`, 'gi'),
+      },
+      email: {
+        $ne: user.email,
+      },
+    });
+  }
+  res.status(200).json({
+    status: 'success',
+    results: users.length,
+    data: users,
+  });
+});

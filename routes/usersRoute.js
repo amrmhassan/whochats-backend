@@ -18,6 +18,7 @@ router.post('/updatePassword', auth.updatePassword);
 router.get('/me', auth.getMe);
 router.patch('/updateMe', auth.updateMe);
 router.get('/getUserData/:id', userController.userGetAnotherUserData);
+router.get('/searchUsers/:q', userController.searchUsers);
 
 //? routes for admins only
 router.use(auth.restrictTo('admin'));
