@@ -45,7 +45,7 @@ export const signUp = catchAsync(async (req, res, next) => {
 
   emailChecker.verify(email, function (err, response) {
     // Print response object
-    if (response.body.disposable === 'true') {
+    if (response.body.disposable == 'true') {
       return next(
         appError.addError(
           `you can't use this email to register, please use real one`,
