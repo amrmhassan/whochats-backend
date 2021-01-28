@@ -5,7 +5,8 @@ import AppError from '../utils/AppError.js';
 import genRandomToken from '../utils/generateRandomToken.js';
 import { sendEmail } from './emailController.js';
 import bcrypt from 'bcrypt';
-import Email from '../utils/email.js';
+import Email from '../utils/email.js'; // Replace API_KEY with your API Key
+import quickemailverification from 'quickemailverification';
 
 const appError = new AppError();
 const frontend_link = 'https://whochats.netlify.app';
@@ -37,36 +38,58 @@ export const signUp = catchAsync(async (req, res, next) => {
   if (existedUser) {
     return next(appError.addError('User already exists', 400));
   }
+  // 2-b] check for email if it is temporary email
+  const emailChecker = quickemailverification
+    .client(process.env.EMAIL_VERIFICATION_API_KEY)
+    .quickemailverification();
+
+  emailChecker.verify(email, function (err, response) {
+    // Print response object
+    if (response.body.disposable === 'true') {
+      return next(
+        appError.addError(
+          `you can't use this email to register, please use real one`,
+          400
+        )
+      );
+    } else {
+      addNewUser();
+    }
+  });
 
   // 3] send verification email
   // 4] generate random token 32 letters and numbers
-  const randomTokenVerifying = genRandomToken(32);
-  const encryptedToken = await bcrypt.hash(randomTokenVerifying, 8);
 
-  // 2] generate url for verification
-  const url = `${frontend_link}/verifyEmail/${randomTokenVerifying}`;
+  async function addNewUser() {
+    const randomTokenVerifying = genRandomToken(32);
+    const encryptedToken = await bcrypt.hash(randomTokenVerifying, 8);
 
-  await new Email({ firstName, email }, url).verifyEmail();
-  const user = await User.create({
-    firstName,
-    lastName,
-    email,
-    password,
-    passwordConfirm,
-    phone,
-    photo,
-  });
+    // 2] generate url for verification
+    const url = `${frontend_link}/verifyEmail/${randomTokenVerifying}`;
 
-  // 4-a] save random token to database after hashing it && change expiry date
+    await new Email({ firstName, email }, url).verifyEmail();
+    const user = await User.create({
+      firstName,
+      lastName,
+      email,
+      password,
+      passwordConfirm,
+      phone,
+      photo,
+    });
 
-  //====================
+    // 4-a] save random token to database after hashing it && change expiry date
 
-  user.randomTokenVerifying = encryptedToken;
-  await user.save({ validateBeforeSave: false });
-  res.status(200).json({
-    status: 'success',
-    data: user,
-  });
+    //====================
+
+    user.randomTokenVerifying = encryptedToken;
+    await user.save({ validateBeforeSave: false });
+    res.status(200).json({
+      status: 'success',
+      data: user,
+    });
+  }
+
   // createAndSendToken(user, res, 201);
 });
 //? logging users in

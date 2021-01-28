@@ -3,6 +3,7 @@
     "middlewares",
     "originalname",
     "postbuild",
+    "quickemailverification",
     "twilio"
   ]
 }
