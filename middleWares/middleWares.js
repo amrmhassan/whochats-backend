@@ -44,12 +44,12 @@ export default {
       express.static(path.join(__dirname, './uploads/'))
     );
 
-    if (process.env.NODE_ENV === 'production') {
-      app.use(express.static(path.join(__dirname, '/build')));
-      app.get('*', (req, res) =>
-        res.sendFile(path.resolve(__dirname, '/build/index.html'))
-      );
-    }
+    // if (process.env.NODE_ENV === 'production') {
+    //   app.use(express.static(path.join(__dirname, '/build')));
+    //   app.get('*', (req, res) =>
+    //     res.sendFile(path.resolve(__dirname, '/build/index.html'))
+    //   );
+    // }
 
     app.all('*', (req, res, next) => {
       return next(
