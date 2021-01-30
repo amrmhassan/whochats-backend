@@ -7,7 +7,8 @@ import messagesRoutes from '../routes/messagesRoutes.js';
 import emailRoutes from '../routes/emailRoutes.js';
 import blockRoutes from '../routes/blockRoutes.js';
 import smsRoutes from '../routes/smsRoutes.js';
-import uploadsRoute from '../routes/uploadsRoute.js';
+import uploadProfilePhotoRoute from '../routes/uploadProfilePhotoRoute.js';
+import uploadRecordRoute from '../routes/uploadRecordRoute.js';
 import express from 'express';
 import globalErrorHandling from '../utils/globalErrorHandling.js';
 import AppError from '../utils/AppError.js';
@@ -33,7 +34,8 @@ export default {
     app.use('/api/v1/messages', messagesRoutes);
     app.use('/api/v1/emails', emailRoutes);
     app.use('/api/v1/blocks', blockRoutes);
-    app.use('/api/v1/upload', uploadsRoute);
+    app.use('/api/v1/uploadProfilePhotoRoute', uploadProfilePhotoRoute);
+    app.use('/api/v1/uploadRecordRoute', uploadRecordRoute);
     app.use('/sms', smsRoutes);
 
     app.use(

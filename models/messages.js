@@ -18,6 +18,15 @@ const messageSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    messageType: {
+      type: String,
+      enum: ['text', 'record'],
+      required: true,
+      default: 'text',
+    },
+    mediaLink: {
+      type: String,
+    },
     messageTXT: {
       type: String,
       required: true,

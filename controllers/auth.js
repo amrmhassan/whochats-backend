@@ -419,7 +419,6 @@ export const verifyEmail = catchAsync(async (req, res, next) => {
       appError.addError('please verify with the same device you signed up', 401)
     );
   }
-  console.log({ token, email });
   // 2] getting user from database by email
   const user = await User.findOne({ email });
   if (!user) {

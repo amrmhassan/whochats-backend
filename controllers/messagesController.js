@@ -11,7 +11,14 @@ const appError = new AppError();
 //? for creating new message
 export const createMessage = catchAsync(async (req, res, next) => {
   // 1] get( roomId, receiver, message) from req.body
-  const { room, receiver, messageTXT, clientId } = req.body;
+  const {
+    room,
+    receiver,
+    messageTXT,
+    clientId,
+    messageType,
+    mediaLink,
+  } = req.body;
   if (!room || !receiver || !messageTXT) {
     return next(
       appError.addError(`please provide room and receiver and messageTXT`, 400)
@@ -38,6 +45,8 @@ export const createMessage = catchAsync(async (req, res, next) => {
     receiver,
     messageTXT,
     clientId,
+    messageType,
+    mediaLink,
   });
   //! emitting the event of sending messages to receiver
   const senderOnlineId = sender.onlineId;
@@ -97,9 +106,12 @@ export const getRoomMessages = catchAsync(async (req, res, next) => {
     if (currentMessageDay !== currentDay) {
       currentDay = currentMessageDay;
       const dayMsg = {
+        messageType: 'text',
         sender: 'admin',
         messageTXT: currentMessageDay,
         createdAt: message.createdAt,
+        //? this prop is only for providing clientId for React key when it is show on the list
+        clientId: Math.random().toString(),
       };
       messagesClone.push(dayMsg);
     }
