@@ -21,8 +21,6 @@ export default {
 
     app.use(express.json());
 
-    // app.use(bodyParser.json({ limit: '1mb' }));
-    // app.use(bodyParser.urlencoded({ limit: '1mb', extended: true }));
     app.use(cors());
     app.use((req, res, next) => {
       req.requestedAt = new Date().toISOString();
@@ -38,18 +36,7 @@ export default {
     app.use('/api/v1/uploadRecordRoute', uploadRecordRoute);
     app.use('/sms', smsRoutes);
 
-    app.use(
-      '/uploads',
-      // auth.protectNormalUser,
-      express.static(path.join(__dirname, './uploads/'))
-    );
-
-    // if (process.env.NODE_ENV === 'production') {
-    //   app.use(express.static(path.join(__dirname, '/build')));
-    //   app.get('*', (req, res) =>
-    //     res.sendFile(path.resolve(__dirname, '/build/index.html'))
-    //   );
-    // }
+    app.use('/uploads', express.static(path.join(__dirname, './uploads/')));
 
     app.all('*', (req, res, next) => {
       return next(
