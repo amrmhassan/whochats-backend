@@ -1,6 +1,5 @@
 import express from 'express';
 import MulterConfig from '../utils/MulterConfig.js';
-import * as auth from '../controllers/auth.js';
 import ffmpeg from 'ffmpeg';
 
 const convertToMp3 = (filePath) => {
