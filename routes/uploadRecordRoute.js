@@ -1,30 +1,30 @@
 import express from 'express';
 import MulterConfig from '../utils/MulterConfig.js';
 import * as auth from '../controllers/auth.js';
-// import ffmpeg from 'ffmpeg';
+import ffmpeg from 'ffmpeg';
 
-// const convertToMp3 = (filePath) => {
-//   try {
-//     var process = new ffmpeg(filePath);
-//     process.then(
-//       function (video) {
-//         // Callback mode
-//         video.fnExtractSoundToMP3(
-//           filePath.replace('.mpeg', '.mp3'),
-//           function (error, file) {
-//             if (error) console.log({ error });
-//             if (!error) console.log('Audio file: ' + file);
-//           }
-//         );
-//       },
-//       function (err) {
-//         console.log('Error: ' + err);
-//       }
-//     );
-//   } catch (e) {
-//     console.log({ error2: e });
-//   }
-// };
+const convertToMp3 = (filePath) => {
+  try {
+    var process = new ffmpeg(filePath);
+    process.then(
+      function (video) {
+        // Callback mode
+        video.fnExtractSoundToMP3(
+          filePath.replace('.mpeg', '.mp3'),
+          function (error, file) {
+            if (error) console.log({ error });
+            if (!error) console.log('Audio file: ' + file);
+          }
+        );
+      },
+      function (err) {
+        console.log('Error: ' + err);
+      }
+    );
+  } catch (e) {
+    console.log({ error2: e });
+  }
+};
 
 const router = express.Router();
 //? records mime type is audio/mpeg-3
@@ -34,10 +34,10 @@ router.post(
   '/',
   // auth.protectNormalUser,
   mc.upload().single('record'),
-  // (req, res, next) => {
-  //   convertToMp3(req.file.path);
-  //   next();
-  // },
+  (req, res, next) => {
+    convertToMp3(req.file.path);
+    next();
+  },
   (req, res, next) => {
     res.status(200).json({
       status: 'success',
