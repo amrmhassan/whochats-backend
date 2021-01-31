@@ -1,6 +1,6 @@
 import multer from 'multer';
 import sharp from 'sharp';
-import AppError from '../utils/AppError.js';
+import AppError from './AppError.js';
 
 const appError = new AppError();
 

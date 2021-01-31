@@ -1,5 +1,5 @@
 import express from 'express';
-import MulterConfig from '../utils/multerConfig.js';
+import MulterConfig from '../utils/MulterConfig.js';
 
 const router = express.Router();
 const mc = new MulterConfig(
